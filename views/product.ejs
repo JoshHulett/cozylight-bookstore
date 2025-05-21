@@ -95,6 +95,9 @@
         </nav>
     </header>
 
+    <!--Notification for wishlist-->
+    <div id="wishlist-notification" class="wishlist-notification hidden"></div>
+
     <!--banner with background image and captions, along with an overlaying searchbar-->
     <div class="productBackground w-100">
         <div class="d-flex flex-column justify-content-center align-items-center py-5">
@@ -127,7 +130,13 @@
     <div class="body p-5 m-3 mb-5 rounded shadow-lg scroll-fade">
         <div class="row">
             <div class="col-md-4 col-12 py-3">
-                <img src="/images/<%= book.product_image %>" alt="Product Image" class="img-fluid shadow rounded">
+                <!-- <img src="/images/<%= book.product_image %>" alt="Product Image" class="img-fluid shadow rounded"> -->
+                <div class="product-image-container">
+                    <img src="/images/<%= book.product_image %>" alt="Product Image" class="card-img-top img-fluid">
+                    <button class="wishlist-heart hover" data-id="<%= book.id %>">
+                        <img src="/images/heart_empty.png" alt="wishlist" class="wishlist-icon">
+                    </button>
+                </div>
             </div>
             <div class="col-md-5 col-12 px-3 py-3">
                 <h3 class="display-6"><strong>
@@ -268,6 +277,7 @@
         });
     </script>
     <script src="/js/recentlyViewed.js"></script>
+    <script src="/js/wishlist.js"></script>
     <script src="/hover.js"></script>
 
     <!--bootstrap javascript-->

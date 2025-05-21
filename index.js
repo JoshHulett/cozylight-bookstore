@@ -245,6 +245,34 @@ app.post("/recentlyviewed", (req, res) => {
   });
 });
 
+app.post("/wishlist", (req, res) => {
+  console.log("Sever received IDs:", req.body);
+  const bookIds = req.body.ids;
+
+  if (!Array.isArray(bookIds) || bookIds.length === 0) {
+    return res.status(400).json({ error: "No book IDs in LocalStorage" })
+  }
+
+  // Generate placeholders (?, ?) for the SQLite query
+  // Allows query to adapt to the number of ids in the localstorage
+  const placeholders = bookIds.map(() => '?').join(', ');
+
+  // Dynamically generate query
+  const sqlQuery = `SELECT * FROM BOOKS WHERE id IN (${placeholders})`;
+
+  bookdb.all(sqlQuery, bookIds, (err, rows) => {
+    if (err) {
+      console.error("Error fetching recently viewed books:", err.message);
+      return res.status(500).json({ err: "Database error" });
+    }
+
+    // Sort rows so that most recently viewed in shown first
+    const sortedRows = bookIds.map(id => rows.find(book => book.id == id)).filter(Boolean);
+
+    res.json(sortedRows);
+  });
+});
+
 // Tell our application to listen to requests at port 3000 on the localhost
 app.listen(port, () => {
   // When the application starts, print to the console that our app is
