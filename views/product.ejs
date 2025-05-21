@@ -104,8 +104,7 @@
             <form action="/search" method="post" class="d-flex" role="search">
                 <div class="input-group w-100 pb-3">
                     <input class="form-control" type="search" id="search" name="search"
-                        placeholder="Search products, genres" aria-label="Search"
-                        style="height: 50px; font-size: 20px">
+                        placeholder="Search products, genres" aria-label="Search" style="height: 50px; font-size: 20px">
                     <button class="btn h-100" type="submit" style="height: 50px; font-size: 20px;">
                         <i class="bi bi-search"></i>
                     </button>
@@ -125,7 +124,7 @@
 
     <!--full product display. Includes image, text, radio-check buttons for format, and price/purhcase window-->
     <!--dynamically displays the information of the box the user clicked on through database interactions-->
-    <div class="body p-5 m-3 rounded shadow-lg scroll-fade">
+    <div class="body p-5 m-3 mb-5 rounded shadow-lg scroll-fade">
         <div class="row">
             <div class="col-md-4 col-12 py-3">
                 <img src="/images/<%= book.product_image %>" alt="Product Image" class="img-fluid shadow rounded">
@@ -193,6 +192,13 @@
         </div>
     </div>
 
+    <div class="body p-5 m-3 rounded shadow scroll-fade">
+        <h3><strong>Most recently viewed:</strong></h3>
+        <div class="row" id="recently-viewed-placeholder">
+
+        </div>
+    </div>
+
     <!--universal footer used throughout the website-->
     <!--universal footer used throughout the website-->
     <footer class="mt-5">
@@ -254,6 +260,15 @@
 
     <script src="/product.js"></script>
     <script src="/fadeScroll.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.bookID = "<%= book.id %>";
+            console.log("Book ID on page:", window.bookID);
+            saveViewedBook(window.bookID);
+        });
+    </script>
+    <script src="/js/recentlyViewed.js"></script>
+    <script src="/hover.js"></script>
 
     <!--bootstrap javascript-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
