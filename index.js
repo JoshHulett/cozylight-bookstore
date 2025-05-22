@@ -48,6 +48,7 @@ app.use(express.static('public_html'))
 const path = require('path');
 const { isAsyncFunction } = require('util/types');
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 //view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -94,6 +95,28 @@ app.get('/bestseller', (req, res) => {
       res.status(500).send("Database error");
     } else {
       res.render('bestSeller', { books })
+    }
+  })
+});
+
+// Get review writing page, pulling from booksdb
+app.get('/writereview', (req, res) => {
+  getAllBooks((err, books) => {
+    if (err) {
+      res.status(500).send("Database error");
+    } else {
+      res.render('writeReview', { books })
+    }
+  })
+});
+
+// Get drafts page, pulling from booksdb
+app.get('/reviewdrafts', (req, res) => {
+  getAllBooks((err, books) => {
+    if (err) {
+      res.status(500).send("Database error");
+    } else {
+      res.render('reviewDrafts', { books })
     }
   })
 });
@@ -216,7 +239,89 @@ app.post('/search', (req, res, next) => {
   )
 });
 
+app.post("/recentlyviewed", (req, res) => {
+  console.log("Sever received IDs:", req.body);
+  const bookIds = req.body.ids;
 
+  if (!Array.isArray(bookIds) || bookIds.length === 0) {
+    return res.status(400).json({ error: "No book IDs in LocalStorage" })
+  }
+
+  // Generate placeholders (?, ?) for the SQLite query
+  // Allows query to adapt to the number of ids in the localstorage
+  const placeholders = bookIds.map(() => '?').join(', ');
+
+  // Dynamically generate query
+  const sqlQuery = `SELECT * FROM BOOKS WHERE id IN (${placeholders})`;
+
+  bookdb.all(sqlQuery, bookIds, (err, rows) => {
+    if (err) {
+      console.error("Error fetching recently viewed books:", err.message);
+      return res.status(500).json({ err: "Database error" });
+    }
+
+    // Sort rows so that most recently viewed in shown first
+    const sortedRows = bookIds.map(id => rows.find(book => book.id == id)).filter(Boolean);
+
+    res.json(sortedRows);
+  });
+});
+
+app.post("/wishlist", (req, res) => {
+  console.log("Sever received IDs:", req.body);
+  const bookIds = req.body.ids;
+
+  if (!Array.isArray(bookIds) || bookIds.length === 0) {
+    return res.status(400).json({ error: "No book IDs in LocalStorage" })
+  }
+
+  // Generate placeholders (?, ?) for the SQLite query
+  // Allows query to adapt to the number of ids in the localstorage
+  const placeholders = bookIds.map(() => '?').join(', ');
+
+  // Dynamically generate query
+  const sqlQuery = `SELECT * FROM BOOKS WHERE id IN (${placeholders})`;
+
+  bookdb.all(sqlQuery, bookIds, (err, rows) => {
+    if (err) {
+      console.error("Error fetching recently viewed books:", err.message);
+      return res.status(500).json({ err: "Database error" });
+    }
+
+    // Sort rows so that most recently viewed in shown first
+    const sortedRows = bookIds.map(id => rows.find(book => book.id == id)).filter(Boolean);
+
+    res.json(sortedRows);
+  });
+});
+
+app.post("/drafts", (req, res) => {
+  console.log("Sever received IDs:", req.body);
+  const bookIds = req.body.ids;
+
+  if (!Array.isArray(bookIds) || bookIds.length === 0) {
+    return res.status(400).json({ error: "No book IDs in LocalStorage" })
+  }
+
+  // Generate placeholders (?, ?) for the SQLite query
+  // Allows query to adapt to the number of ids in the localstorage
+  const placeholders = bookIds.map(() => '?').join(', ');
+
+  // Dynamically generate query
+  const sqlQuery = `SELECT * FROM BOOKS WHERE id IN (${placeholders})`;
+
+  bookdb.all(sqlQuery, bookIds, (err, rows) => {
+    if (err) {
+      console.error("Error fetching recently viewed books:", err.message);
+      return res.status(500).json({ err: "Database error" });
+    }
+
+    // Sort rows so that most recently viewed in shown first
+    const sortedRows = bookIds.map(id => rows.find(book => book.id == id)).filter(Boolean);
+
+    res.json(sortedRows);
+  });
+});
 
 // Tell our application to listen to requests at port 3000 on the localhost
 app.listen(port, () => {
